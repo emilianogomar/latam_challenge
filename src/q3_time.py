@@ -10,6 +10,8 @@ def q3_time(file_path: str) -> List[Tuple[str, int]]:
     # Read the json file
     df = pd.read_json(file_path, lines=True)
 
+    dr = ''
+
     # Discard the rows with no mencioned users
     df_filtered = df[df['mentionedUsers'].apply(lambda x: bool(x))]
 
