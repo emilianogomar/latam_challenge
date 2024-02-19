@@ -1,0 +1,7 @@
+Q3 Time No Optimizada:
+
+711567 function calls (711076 primitive calls) in 15.320 seconds
+
+Q3 Time Optimizada:
+
+711441 function calls (710950 primitive calls) in 13.857 seconds

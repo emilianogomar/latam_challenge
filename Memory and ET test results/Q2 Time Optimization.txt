@@ -1,0 +1,7 @@
+Q2 Time No Optimizada:
+
+3926274 function calls (3925893 primitive calls) in 32.150 seconds
+
+Q2 Time Optimizada:
+
+3925670 function calls (3925297 primitive calls) in 31.374 seconds
