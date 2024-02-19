@@ -1,0 +1,55 @@
+Q2 no optimizada para uso de memoria:
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    10    298.9 MiB    298.9 MiB           1   @profile
+    11                                         def q2_time(file_path: str) -> List[Tuple[str, int]]:
+    12                                         
+    13                                             # read Json File
+    14   1423.0 MiB   1124.1 MiB           1       df = pd.read_json(file_path, lines=True)
+    15                                         
+    16                                             # Counter of emojis
+    17   1423.0 MiB      0.0 MiB           1       total_emojis = Counter()
+    18                                         
+    19                                             # identify emojis in twitter content and count them
+    20   1423.0 MiB -3268011.9 MiB      117408       for tweet_text in df['content']:
+    21   1423.0 MiB -3268004.4 MiB      117407           emojis = regex.findall(r'[\U0001F300-\U0001F5FF\U0001F600-\U0001F64F\U0001F680-\U0001F6FF\U0001F700-\U0001F77F\U0001F780-\U0001F7FF\U0001F800-\U0001F8FF\U0001F900-\U0001F9FF\U0001FA00-\U0001FA6F\U0001FA70-\U0001FAFF\U00002702-\U000027B0\U000024C2-\U0001F251\U0001f926-\U0001f937\U0001F1E0-\U0001F1FF]{1}', tweet_text)
+    22   1423.0 MiB -3268011.7 MiB      117407           total_emojis.update(Counter(emojis))
+    23                                         
+    24                                             # Get top 10 emojis used
+    25   1395.2 MiB    -27.8 MiB           1       top_10_emojis = total_emojis.most_common(10)
+    26                                         
+    27   1395.2 MiB      0.0 MiB          11       emoji_list = [(emoji, count) for emoji, count in top_10_emojis]
+    28                                         
+    29   1395.2 MiB      0.0 MiB           1       return emoji_list
+
+Q2 optimizada para uso de memoria:
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    10    289.2 MiB    289.2 MiB           1   @profile
+    11                                         def q2_memory(file_path: str) -> List[Tuple[str, int]]:
+    12                                         
+    13                                             # read Json File
+    14   1423.7 MiB   1134.5 MiB           1       df = pd.read_json(file_path, lines=True)
+    15                                         
+    16   1423.7 MiB      0.0 MiB           1       columns_to_keep = ['content']
+    17   1423.7 MiB    -49.2 MiB          22       df = df.drop(columns=[col for col in df.columns if col not in columns_to_keep])
+    18                                         
+    19                                             # Counter of emojis
+    20   1374.5 MiB    -49.2 MiB           1       total_emojis = Counter()
+    21                                         
+    22                                             # identify emojis in twitter content and count them
+    23   1374.5 MiB -322556.2 MiB      117408       for tweet_text in df['content']:
+    24   1374.5 MiB -322555.4 MiB      117407           emojis = regex.findall(r'[\U0001F300-\U0001F5FF\U0001F600-\U0001F64F\U0001F680-\U0001F6FF\U0001F700-\U0001F77F\U0001F780-\U0001F7FF\U0001F800-\U0001F8FF\U0001F900-\U0001F9FF\U0001FA00-\U0001FA6F\U0001FA70-\U0001FAFF\U00002702-\U000027B0\U000024C2-\U0001F251\U0001f926-\U0001f937\U0001F1E0-\U0001F1FF]{1}', tweet_text)
+    25   1374.5 MiB -322555.9 MiB      117407           total_emojis.update(Counter(emojis))
+    26                                         
+    27    305.3 MiB  -1069.2 MiB           1       del df
+    28    305.3 MiB      0.0 MiB           1       gc.collect()
+    29                                         
+    30                                             # Get top 10 emojis used
+    31    305.3 MiB      0.0 MiB           1       top_10_emojis = total_emojis.most_common(10)
+    32                                         
+    33    305.3 MiB      0.0 MiB          11       emoji_list = [(emoji, count) for emoji, count in top_10_emojis]
+    34                                         
+    35    305.3 MiB      0.0 MiB           1       return emoji_list

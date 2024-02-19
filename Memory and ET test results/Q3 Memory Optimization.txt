@@ -1,0 +1,48 @@
+Q3 no optimizada para uso de memoria:
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+     7    182.0 MiB    182.0 MiB           1   @profile
+     8                                         def q3_time(file_path: str) -> List[Tuple[str, int]]:
+     9                                         
+    10                                             # Read the json file
+    11   1398.6 MiB   1216.6 MiB           1       df = pd.read_json(file_path, lines=True)
+    12                                         
+    13                                             # Discard the rows with no mencioned users
+    14   1406.5 MiB      8.0 MiB      234815       df_filtered = df[df['mentionedUsers'].apply(lambda x: bool(x))]
+    15                                         
+    16                                             # flatten column mencionedUsers
+    17   1426.8 MiB     20.3 MiB           1       df_flattened = df_filtered.explode('mentionedUsers')
+    18                                         
+    19                                             # count for each username the amount of apperances
+    20   1426.8 MiB -508929.0 MiB      206807       username_counts = df_flattened['mentionedUsers'].apply(lambda x: x['username']).value_counts().head(10)
+    21                                         
+    22   1424.4 MiB     -2.4 MiB          11       mencioned_list = [(value, count) for value, count in username_counts.items()]
+    23                                         
+    24   1424.4 MiB      0.0 MiB           1       return mencioned_list
+
+Q3 optimizada para uso de memoria:
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+     7    121.0 MiB    121.0 MiB           1   @profile
+     8                                         def q3_memory(file_path: str) -> List[Tuple[datetime.date, str]]:
+     9                                             
+    10                                             # Read the json file
+    11   1397.7 MiB   1276.8 MiB           1       df = pd.read_json(file_path, lines=True)
+    12                                         
+    13                                             # Discard the rows with no mencioned users
+    14   1398.6 MiB    -12.7 MiB      234815       df = df[df['mentionedUsers'].apply(lambda x: bool(x))]
+    15                                         
+    16                                             # flatten column mencionedUsers
+    17   1395.7 MiB     -2.9 MiB           1       df = df.explode('mentionedUsers')
+    18                                         
+    19                                             # count for each username the amount of apperances
+    20   1395.7 MiB -264576.4 MiB      206807       username_counts = df['mentionedUsers'].apply(lambda x: x['username']).value_counts().head(10)
+    21                                         
+    22   1320.8 MiB    -74.9 MiB           1       del df
+    23   1320.8 MiB      0.0 MiB           1       gc.collect()
+    24                                         
+    25   1320.8 MiB      0.0 MiB          11       mencioned_list = [(value, count) for value, count in username_counts.items()]
+    26                                         
+    27   1320.8 MiB      0.0 MiB           1       return mencioned_list

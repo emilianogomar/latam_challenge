@@ -1,0 +1,79 @@
+Q1 no optimizada para uso de memoria:
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+     7    125.5 MiB    125.5 MiB           1   @profile
+     8                                         def q1_time(file_path: str) -> List[Tuple[datetime.date, str]]:
+     9                                         
+    10                                             # read Json File
+    11   1417.7 MiB   1292.2 MiB           1       df = pd.read_json(file_path, lines=True)
+    12                                         
+    13                                             # Normalize user field
+    14   1421.8 MiB      4.1 MiB           1       normalized_user = json_normalize(df['user'])
+    15                                         
+    16                                             #Add json prefix to all json columns
+    17   1421.8 MiB      0.0 MiB          22       normalized_user.columns = [f'json_{col}' for col in normalized_user.columns]
+    18                                         
+    19                                             # Combine normalized DataFrame with original DataFrame
+    20   1464.4 MiB     42.6 MiB           1       df_2 = pd.concat([df.drop(columns='user'), normalized_user], axis=1)
+    21                                         
+    22                                             # Get top 10 dates with more tweets
+    23   1465.4 MiB      1.0 MiB           1       top_dates = df_2['date'].value_counts().head(10)
+    24                                         
+    25                                             # Get users with more tweets for top 10 dates 
+    26   1465.4 MiB      0.0 MiB           1       users_top_dates = {}
+    27   1465.7 MiB      0.0 MiB          11       for fecha in top_dates.index:
+    28   1465.7 MiB      0.2 MiB          10           users_top_dates[fecha] = df_2[df_2['date'] == fecha]['json_username'].value_counts().idxmax()
+    29                                         
+    30                                             # Convert to proper output format
+    31   1465.7 MiB      0.0 MiB          11       date_list = [(fecha, valor) for fecha, valor in users_top_dates.items()]
+    32                                         
+    33   1465.7 MiB      0.0 MiB           1       return date_list
+
+Q1 optimizada para uso de memoria:
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+     8    191.8 MiB    191.8 MiB           1   @profile
+     9                                         def q1_memory(file_path: str) -> List[Tuple[datetime.date, str]]:
+    10                                             
+    11                                             # read Json File
+    12   1402.9 MiB   1211.1 MiB           1       df = pd.read_json(file_path, lines=True)
+    13                                         
+    14                                             # Normalize user field
+    15   1427.0 MiB     24.1 MiB           1       normalized_user = json_normalize(df['user'])
+    16                                         
+    17                                             #Add json prefix to all json columns
+    18   1427.0 MiB      0.0 MiB          22       normalized_user.columns = [f'json_{col}' for col in normalized_user.columns]
+    19                                         
+    20                                             # Combine normalized DataFrame with original DataFrame and delete the normalized DF
+    21   1444.9 MiB     17.9 MiB           1       df = pd.concat([df.drop(columns='user'), normalized_user], axis=1)
+    22   1426.8 MiB    -18.1 MiB           1       del normalized_user
+    23                                         
+    24                                             # Drop all columns except username and date
+    25   1426.8 MiB      0.0 MiB           1       columnas_a_mantener = ['date', 'json_username']
+    26   1426.8 MiB    -95.2 MiB          42       df = df.drop(columns=[col for col in df.columns if col not in columnas_a_mantener])
+    27                                         
+    28                                             # Change columns types
+    29   1332.6 MiB    -94.2 MiB           1       df['date'] = df['date'].dt.date
+    30   1332.6 MiB      0.0 MiB           1       df['json_username'] = df['json_username'].astype(str)
+    31                                         
+    32                                             # Release non use memory
+    33   1331.7 MiB     -0.9 MiB           1       gc.collect()
+    34                                         
+    35                                             # Get top 10 dates with more tweets
+    36   1331.4 MiB     -0.2 MiB           1       top_dates = df['date'].value_counts().head(10)
+    37                                         
+    38                                             # Get users with more tweets for top 10 dates 
+    39   1331.4 MiB      0.0 MiB           1       users_top_dates = {}
+    40   1331.5 MiB     -0.3 MiB          11       for fecha in top_dates.index:
+    41   1331.5 MiB     -0.3 MiB          10           users_top_dates[fecha] = df[df['date'] == fecha]['json_username'].value_counts().idxmax()
+    42                                         
+    43    206.8 MiB  -1124.7 MiB           1       del df
+    44    206.8 MiB      0.0 MiB           1       gc.collect()
+    45                                         
+    46                                             # Convert to proper output format
+    47    206.8 MiB      0.0 MiB          11       date_list = [(fecha, valor) for fecha, valor in users_top_dates.items()]
+    48                                         
+    49    206.8 MiB      0.0 MiB           1       return date_list
+
