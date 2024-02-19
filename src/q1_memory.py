@@ -21,7 +21,7 @@ def q1_memory(file_path: str) -> List[Tuple[datetime.date, str]]:
     df = pd.concat([df.drop(columns='user'), normalized_user], axis=1)
     del normalized_user
 
-    # Drop all columns except username and date
+    # Drop all columns except json_username and date
     columns_to_keep = ['date', 'json_username']
     df = df.drop(columns=[col for col in df.columns if col not in columns_to_keep])
 

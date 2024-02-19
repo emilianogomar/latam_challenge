@@ -2,4 +2,4 @@ memory-profiler==0.61.0
 pandasql==0.7.3
 pandas==1.26.4
 memory-profiler==0.61.0
-emoji==1.2.0
+
